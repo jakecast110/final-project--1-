@@ -1,0 +1,34 @@
+{% extends 'survey/base.html' %}
+
+{% block title %}Edit Survey{% endblock %}
+
+{% block content %}
+    <h2>Edit Survey: {{ survey.title }}</h2>
+    <p>{{ survey.description }}</p>
+
+    <h3>Add a New Question</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ question_form.as_p }}
+        {{ option_formset.management_form }}
+        <h4>Options:</h4>
+        <div>
+            {% for form in option_formset %}
+                {{ form.as_p }}
+            {% endfor %}
+        </div>
+        <button type="submit">Add Question</button>
+    </form>
+
+    <h3>Existing Questions</h3>
+    <ul>
+        {% for question in questions %}
+            <li>{{ question.question_text }} ({{ question.get_question_type_display }})</li>
+            <ul>
+                {% for option in question.options.all %}
+                    <li>{{ option.option_text }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,12 @@
+<h2>Survey Results: {{ survey.title }}</h2>
+<p>{{ survey.description }}</p>
+
+<h3>Question Statistics</h3>
+{% for question, options in statistics.items %}
+    <h4>{{ question }}</h4>
+    <ul>
+        {% for option, vote_count, percentage in options %}
+            <li>{{ option }}: {{ vote_count }} votes ({{ percentage }}%)</li>
+        {% endfor %}
+    </ul>
+{% endfor %}

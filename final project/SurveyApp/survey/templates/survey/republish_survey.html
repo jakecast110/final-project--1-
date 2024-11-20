@@ -1,0 +1,17 @@
+<h2>Republish Survey: {{ survey.title }}</h2>
+<p>{{ survey.description }}</p>
+
+<h3>Aggregated Statistics (Wisdom of the Crowd)</h3>
+{% for question, options in statistics.items %}
+    <h4>{{ question }}</h4>
+    <ul>
+        {% for option, vote_count in options %}
+            <li>{{ option }}: {{ vote_count }} votes</li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+
+<form method="post" action="{% url 'republish_survey' survey.id %}">
+    {% csrf_token %}
+    <button type="submit">Republish Survey</button>
+</form>
