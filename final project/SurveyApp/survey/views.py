@@ -165,6 +165,7 @@ def close_survey(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, creator=request.user)
     if survey.is_published:
         survey.is_published = False
+        survey.is_closed = True
         survey.save()
         messages.success(request, "Survey closed successfully.")
     return redirect('creator_dashboard')
@@ -175,6 +176,7 @@ def republish_survey(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, creator=request.user)
     if not survey.is_published:
         survey.is_published = True
+        survey.is_closed = False
         survey.save()
 
     questions = survey.questions.all()

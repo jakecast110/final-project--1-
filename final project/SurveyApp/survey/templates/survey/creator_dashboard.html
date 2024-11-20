@@ -15,12 +15,18 @@
                 <div class="survey-item">
                     <h3>{{ survey.title }}</h3>
                     <p>{{ survey.description }}</p>
-                    <p>Status: {{ survey.state|capfirst }}</p>
+                    {% if survey.is_published == True %}
+                    <p>Status: Published</p>
+                    {% elif survey.is_closed == True %}
+                    <p>Status: Closed</p>
+                    {% else %}
+                    <p>Status: Draft</p>
+                    {% endif %}
                     <div class="actions">
                         <a href="{% url 'edit_survey' survey.id %}">Edit</a>
-                        {% if survey.state == 'draft' %}
+                        {% if survey.is_published == False %}
                             <a href="{% url 'publish_survey' survey.id %}">Publish</a>
-                        {% elif survey.state == 'published' %}
+                        {% else %}
                             <a href="{% url 'close_survey' survey.id %}">Close</a>
                         {% endif %}
                         <a href="{% url 'view_results' survey.id %}">View Results</a>
