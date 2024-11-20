@@ -8,7 +8,7 @@ class UserProfile(models.Model):
         ('taker', 'Survey Taker'),
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    roles = models.CharField(max_length=50, default='taker')  # Stores roles as a comma-separated string
+    roles = models.CharField(max_length=50, default='taker')  # Stores roles as a space-separated string
 
     def add_role(self, role):
         """Add a new role to the user if it doesn't already exist."""
@@ -33,6 +33,7 @@ class Survey(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_published = models.BooleanField(default=False)
+    is_closed = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
