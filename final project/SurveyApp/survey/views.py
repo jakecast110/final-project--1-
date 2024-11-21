@@ -204,24 +204,41 @@ def survey_list(request):
 # Take a survey
 @login_required
 def take_survey(request, survey_id):
+    profile = UserProfile.objects.get(user=request.user)
     survey = get_object_or_404(Survey, id=survey_id, is_published=True)
     questions = Question.objects.filter(survey_id=survey_id)
     options = Option.objects.filter(survey_id=survey_id) 
-    return render(request, 'survey/take_survey.html', {'survey': survey, 'questions': questions, 'options': options})
+    response = Response.objects.filter(survey_id=survey_id)
+    #get list of users in responses of surveys
+    users=[]
+    for rsp in response:
+        users.append(rsp.user_id)
+    if request.user.id in users:
+        return render(request, 'survey/taken_survey.html')
+    return render(request, 'survey/take_survey.html', {'survey': survey, 
+                                                       'questions': questions, 
+                                                       'options': options, 
+                                                       'profile': profile, 
+                                                       'response': response,
+                                                       'users':users})
 
 # Submit survey response
 @login_required
 def submit_response(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, is_published=True)
     answers={}
+    errors=0
     if request.method == 'POST':
         questions = survey.questions.all()
         for question in questions:
-            response = request.POST.get(f'question_{question.id}')
+            response = request.POST.get(f'question_{question.id}') #Only grabbing one response for CB
             if response==None:
-                messages.error(request, "Please select at least one answer.")
+                errors+=1
             else:
                 answers[question.id] = response
+        if errors>0:
+            messages.error(request, "Please select at least one answer.")
+            return redirect('take_survey', survey_id=survey_id)
         Response.objects.create(survey=survey, user=request.user.userprofile, answers=answers)
         messages.success(request, "Survey response submitted successfully!")
         return redirect('taker_dashboard')

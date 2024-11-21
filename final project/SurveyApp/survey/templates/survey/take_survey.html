@@ -19,4 +19,9 @@
         {% endfor %}
         <input type="submit" name="response_submit" value="Submit Response">
     </form>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{message}}</p>
+        {% endfor %}
+    {% endif %}
     {% endblock %}
