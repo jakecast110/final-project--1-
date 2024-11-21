@@ -17,10 +17,16 @@ urlpatterns = [
 
     # Survey Creator URLs
     path('survey/create/', views.create_survey, name='create_survey'),
+    path('survey/<int:survey_id>/add_questions/', views.add_questions, name='add_questions'),
     path('survey/<int:survey_id>/edit/', views.edit_survey, name='edit_survey'),
     path('survey/<int:survey_id>/publish/', views.publish_survey, name='publish_survey'),
     path('survey/<int:survey_id>/close/', views.close_survey, name='close_survey'),
     path('survey/<int:survey_id>/republish/', views.republish_survey, name='republish_survey'),
+
+    # Question Management URLs
+    path('survey/<int:survey_id>/question/create/', views.edit_question, name='create_question'),
+    path('survey/<int:survey_id>/question/<int:question_id>/edit/', views.edit_question, name='edit_question'),
+    path('survey/<int:survey_id>/question/<int:question_id>/delete/', views.delete_question, name='delete_question'),
 
     # Survey Results and Statistics URL
     path('survey/<int:survey_id>/results/', views.view_results, name='view_results'),

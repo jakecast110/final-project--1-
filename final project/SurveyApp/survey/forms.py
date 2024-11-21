@@ -1,11 +1,16 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from .models import UserProfile
-from .models import Survey, Question, Option
-from .models import Question
+from .models import UserProfile, Survey, Question, Option
 
+
+# User Registration Form with role selection
 class UserRegistrationForm(forms.ModelForm):
+    ROLE_CHOICES = [
+        ('creator', 'Survey Creator'),
+        ('taker', 'Survey Taker'),
+    ]
+
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'placeholder': 'Password'}),
         label="Password",
@@ -13,6 +18,12 @@ class UserRegistrationForm(forms.ModelForm):
     confirm_password = forms.CharField(
         widget=forms.PasswordInput(attrs={'placeholder': 'Re-enter Password'}),
         label="Re-enter Password",
+    )
+    role = forms.ChoiceField(
+        choices=ROLE_CHOICES,
+        label="Role",
+        widget=forms.RadioSelect,
+        required=True,
     )
 
     class Meta:
@@ -42,20 +53,37 @@ class UserRegistrationForm(forms.ModelForm):
 
         return cleaned_data
 
+
+# Survey Form for creating or editing surveys
 class SurveyForm(forms.ModelForm):
     class Meta:
         model = Survey
         fields = ['title', 'description']
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'Enter survey title'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Enter survey description'}),
+        }
 
+
+# Question Form for creating or editing questions
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ['question_text', 'question_type']
+        widgets = {
+            'question_text': forms.TextInput(attrs={'placeholder': 'Enter question text'}),
+            'question_type': forms.Select(attrs={'class': 'form-control'}),
+        }
 
+
+# Inline formset for managing options of a question
 OptionFormSet = forms.inlineformset_factory(
     Question,
     Option,
     fields=('option_text',),
-    extra=3,
-    can_delete=True
+    extra=3,  # Adjust the number of empty forms to display
+    can_delete=True,
+    widgets={
+        'option_text': forms.TextInput(attrs={'placeholder': 'Enter option text'}),
+    }
 )

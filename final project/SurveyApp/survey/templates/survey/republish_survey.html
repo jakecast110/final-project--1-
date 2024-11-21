@@ -1,17 +1,40 @@
-<h2>Republish Survey: {{ survey.title }}</h2>
-<p>{{ survey.description }}</p>
+{% extends 'survey/base.html' %}
 
-<h3>Aggregated Statistics (Wisdom of the Crowd)</h3>
-{% for question, options in statistics.items %}
-    <h4>{{ question }}</h4>
-    <ul>
-        {% for option, vote_count in options %}
-            <li>{{ option }}: {{ vote_count }} votes</li>
-        {% endfor %}
-    </ul>
-{% endfor %}
+{% block title %}Republish Survey{% endblock %}
 
-<form method="post" action="{% url 'republish_survey' survey.id %}">
-    {% csrf_token %}
-    <button type="submit">Republish Survey</button>
-</form>
+{% block content %}
+    <h2>Republish Survey: {{ survey.title }}</h2>
+    <p>{{ survey.description }}</p>
+
+    <!-- Aggregated Statistics -->
+    <h3>Wisdom of the Crowd: Aggregated Insights</h3>
+    {% if statistics %}
+        <ul>
+            {% for question_text, options in statistics.items %}
+                <li>
+                    <strong>{{ question_text }}</strong>
+                    {% if options %}
+                        <ul>
+                            {% for option_text, vote_count in options %}
+                                <li>{{ option_text }}: {{ vote_count }} votes</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No responses recorded for this question.</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No previous responses available for this survey.</p>
+    {% endif %}
+
+    <!-- Button to Confirm Republish -->
+    <form method="post" action="{% url 'republish_survey' survey.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Republish Survey</button>
+    </form>
+
+    <!-- Back to Dashboard -->
+    <a href="{% url 'creator_dashboard' %}" class="btn btn-link">Back to Dashboard</a>
+{% endblock %}

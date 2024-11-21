@@ -1,0 +1,53 @@
+{% extends 'survey/base.html' %}
+
+{% block title %}Edit Question{% endblock %}
+
+{% block content %}
+    <h2>Edit Question</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ question_form.as_p }}
+
+        <h4>Options:</h4>
+        <div id="options-container">
+            {{ option_formset.management_form }}
+            {% for form in option_formset %}
+                <div class="option-form">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Add Option Button -->
+        <button type="button" id="add-option-btn" class="btn btn-secondary">Add Option</button>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+
+    <a href="{% url 'edit_survey' survey.id %}" class="btn btn-link mt-3">Back to Survey</a>
+
+    <script>
+        // JavaScript to dynamically add more options
+        document.getElementById('add-option-btn').addEventListener('click', function() {
+            const optionsContainer = document.getElementById('options-container');
+            const totalForms = document.getElementById('id_options-TOTAL_FORMS');  // Update management form total
+            const currentIndex = parseInt(totalForms.value);
+
+            // Clone the last option form
+            const emptyForm = document.querySelector('.option-form').cloneNode(true);
+
+            // Update the cloned form's input names and IDs
+            emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, currentIndex);
+
+            // Clear the values in the cloned form
+            emptyForm.querySelectorAll('input').forEach(input => input.value = '');
+
+            // Append the new form
+            optionsContainer.appendChild(emptyForm);
+
+            // Increment the total forms count
+            totalForms.value = currentIndex + 1;
+        });
+    </script>
+{% endblock %}

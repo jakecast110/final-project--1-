@@ -6,6 +6,7 @@
     <h2>Edit Survey: {{ survey.title }}</h2>
     <p>{{ survey.description }}</p>
 
+    <!-- Add a New Question -->
     <h3>Add a New Question</h3>
     <form method="post">
         {% csrf_token %}
@@ -14,21 +15,45 @@
         <h4>Options:</h4>
         <div>
             {% for form in option_formset %}
-                {{ form.as_p }}
+                <div>
+                    {{ form.as_p }}
+                </div>
             {% endfor %}
         </div>
-        <button type="submit">Add Question</button>
+        <button type="submit" class="btn btn-primary">Add Question</button>
     </form>
 
+    <!-- List of Existing Questions -->
     <h3>Existing Questions</h3>
     <ul>
         {% for question in questions %}
-            <li>{{ question.question_text }} ({{ question.get_question_type_display }})</li>
-            <ul>
-                {% for option in question.options.all %}
-                    <li>{{ option.option_text }}</li>
-                {% endfor %}
-            </ul>
+            <li>
+                <strong>{{ question.question_text }}</strong> ({{ question.get_question_type_display }})
+                <ul>
+                    {% for option in question.options.all %}
+                        <li>{{ option.option_text }}</li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'edit_question' survey.id question.id %}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{% url 'delete_question' survey.id question.id %}" class="btn btn-danger btn-sm">Delete</a>
+            </li>
         {% endfor %}
     </ul>
+
+    <!-- Publish or Close Survey -->
+    <div class="mt-4">
+        {% if not survey.is_published %}
+            <form method="post" action="{% url 'publish_survey' survey.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Publish Survey</button>
+            </form>
+        {% else %}
+            <form method="post" action="{% url 'close_survey' survey.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">Close Survey</button>
+            </form>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'creator_dashboard' %}" class="btn btn-link mt-3">Back to Dashboard</a>
 {% endblock %}

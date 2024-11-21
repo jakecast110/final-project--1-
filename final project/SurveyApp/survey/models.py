@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.timezone import now
+
 
 # User Profile to allow multiple roles for a user
 class UserProfile(models.Model):
@@ -8,7 +10,7 @@ class UserProfile(models.Model):
         ('taker', 'Survey Taker'),
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    roles = models.CharField(max_length=50, default='taker')  # Stores roles as a space-separated string
+    roles = models.CharField(max_length=50, default='taker')  # Stores roles as a comma-separated string
 
     def add_role(self, role):
         """Add a new role to the user if it doesn't already exist."""
@@ -52,6 +54,13 @@ class Question(models.Model):
     survey = models.ForeignKey(Survey, related_name='questions', on_delete=models.CASCADE)
     question_text = models.CharField(max_length=255, null=True)
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES, null=True)
+    updated_at = models.DateTimeField(auto_now=True)  # Tracks when the question was last updated
+    deleted_at = models.DateTimeField(null=True, blank=True)  # Soft delete
+
+    def delete(self, *args, **kwargs):
+        """Soft delete the question."""
+        self.deleted_at = now()
+        self.save()
 
     def __str__(self):
         return self.question_text
@@ -60,19 +69,43 @@ class Question(models.Model):
 # Option model to store the options for each question
 class Option(models.Model):
     question = models.ForeignKey(Question, related_name='options', on_delete=models.CASCADE)
-    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     option_text = models.CharField(max_length=255, null=True)
+    updated_at = models.DateTimeField(auto_now=True)  # Tracks when the option was last updated
+    deleted_at = models.DateTimeField(null=True, blank=True)  # Soft delete
+
+    def delete(self, *args, **kwargs):
+        """Soft delete the option."""
+        self.deleted_at = now()
+        self.save()
 
     def __str__(self):
         return self.option_text
+
+    class Meta:
+        ordering = ['id']  # Orders options by their creation order
 
 
 # Response model to store the responses of survey takers
 class Response(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    answers = models.JSONField()  # Stores answers in JSON format
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Response by {self.user} to {self.survey.title}"
+
+
+# Answer model for normalized response storage
+class Answer(models.Model):
+    response = models.ForeignKey(Response, related_name='answers', on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_options = models.ManyToManyField(Option, blank=True)  # For multiple-choice or checkbox answers
+
+    def save(self, *args, **kwargs):
+        # Ensure selected options belong to the same question
+        if self.selected_options.exists() and not all(option.question == self.question for option in self.selected_options.all()):
+            raise ValueError("All selected options must belong to the same question.")
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Answer to {self.question}"
