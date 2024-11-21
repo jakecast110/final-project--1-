@@ -135,6 +135,7 @@ def edit_survey(request, survey_id):
             options = option_formset.save(commit=False)
             for option in options:
                 option.question = question
+                option.survey = survey
                 option.save()
 
             messages.success(request, "Question added successfully!")
@@ -154,6 +155,8 @@ def edit_survey(request, survey_id):
 def publish_survey(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, creator=request.user)
     if not survey.is_published:
+        if survey.is_closed:
+            survey.is_closed = False
         survey.is_published = True
         survey.save()
         messages.success(request, "Survey published successfully!")
@@ -202,7 +205,9 @@ def survey_list(request):
 @login_required
 def take_survey(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, is_published=True)
-    return render(request, 'survey/take_survey.html', {'survey': survey})
+    questions = Question.objects.filter(survey_id=survey_id).prefetch_related("options")
+    #options = Option.objects.filter(survey_id=survey_id) #Need to filter by survey and question
+    return render(request, 'survey/take_survey.html', {'survey': survey, 'questions': questions})
 
 # Submit survey response
 @login_required

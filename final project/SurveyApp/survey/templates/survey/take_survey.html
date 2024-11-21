@@ -1,0 +1,16 @@
+{% extends 'survey/base.html' %}
+
+{% block content %}
+    <h2>{{survey.title}}</h2>
+    <p>{{survey.description}}</p>
+    {% for question in questions %}
+        <p>{{question.question_text}}</p>
+        {% for option in questions.options.all %}
+            {% if question.question_type == 'MC' %}
+                <p><input type="radio">{{option.option_text}}</p>
+            {% else %}
+                <p><input type="checkbox">{{option.option_text}}</p>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

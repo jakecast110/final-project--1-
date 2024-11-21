@@ -60,6 +60,7 @@ class Question(models.Model):
 # Option model to store the options for each question
 class Option(models.Model):
     question = models.ForeignKey(Question, related_name='options', on_delete=models.CASCADE)
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     option_text = models.CharField(max_length=255, null=True)
 
     def __str__(self):
