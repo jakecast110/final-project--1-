@@ -205,19 +205,26 @@ def survey_list(request):
 @login_required
 def take_survey(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, is_published=True)
-    questions = Question.objects.filter(survey_id=survey_id).prefetch_related("options")
-    #options = Option.objects.filter(survey_id=survey_id) #Need to filter by survey and question
-    return render(request, 'survey/take_survey.html', {'survey': survey, 'questions': questions})
+    questions = Question.objects.filter(survey_id=survey_id)
+    options = Option.objects.filter(survey_id=survey_id) 
+    return render(request, 'survey/take_survey.html', {'survey': survey, 'questions': questions, 'options': options})
 
 # Submit survey response
 @login_required
 def submit_response(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, is_published=True)
+    answers={}
     if request.method == 'POST':
-        responses = {str(question.id): request.POST.get(str(question.id)) for question in survey.questions.all()}
-        Response.objects.create(survey=survey, user=request.user.userprofile, answers=responses)
+        questions = survey.questions.all()
+        for question in questions:
+            response = request.POST.get(f'question_{question.id}')
+            if response==None:
+                messages.error(request, "Please select at least one answer.")
+            else:
+                answers[question.id] = response
+        Response.objects.create(survey=survey, user=request.user.userprofile, answers=answers)
         messages.success(request, "Survey response submitted successfully!")
-        return redirect('survey_list')
+        return redirect('taker_dashboard')
     return redirect('take_survey', survey_id=survey_id)
 
 # View results for a survey

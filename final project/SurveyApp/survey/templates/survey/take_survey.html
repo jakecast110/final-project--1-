@@ -3,14 +3,20 @@
 {% block content %}
     <h2>{{survey.title}}</h2>
     <p>{{survey.description}}</p>
-    {% for question in questions %}
-        <p>{{question.question_text}}</p>
-        {% for option in questions.options.all %}
-            {% if question.question_type == 'MC' %}
-                <p><input type="radio">{{option.option_text}}</p>
-            {% else %}
-                <p><input type="checkbox">{{option.option_text}}</p>
-            {% endif %}
+    <form method="POST" action="{% url 'submit_response' survey.id%}">
+        {% csrf_token %}
+        {% for question in questions %}
+            <p>{{question.question_text}}</p>
+            {% for option in options %}
+                {% if option.question_id == question.id%}
+                    {% if question.question_type == 'MC' %}
+                        <p><input name='question_{{question.id}}' type="radio" value={{option.id}}>{{option.option_text}}</p>
+                    {% else %}
+                        <p><input name='question_{{question.id}}' type="checkbox" value={{option.id}}>{{option.option_text}}</p>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-{% endblock %}
+        <input type="submit" name="response_submit" value="Submit Response">
+    </form>
+    {% endblock %}
