@@ -96,7 +96,7 @@ def taker_dashboard(request):
     surveys = Survey.objects.filter(is_published=True)
     return render(request, 'survey/taker_dashboard.html', {
         'surveys': surveys,
-        'role': 'Survey Taker'
+        'role': 'Survey Taker',
     })
 
 # Create a new survey
