@@ -1,49 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey App - Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 300px;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h1 {
-            margin-bottom: 20px;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-        }
-        .register-link {
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
-    </style>
+    <title>Survey App</title>
+    <!-- External CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{% static 'SurveyApp/styles.css' %}">
+    <!-- Local JavaScript -->
+    <script src="{% static 'SurveyApp/script.js' %}" defer></script>
 </head>
 <body>
     <div class="container">
-        <h1>Survey App</h1>
+        <h1>Group No. 10 presents - Survey System as TDS Project</h1>
         <h2>Login</h2>
         
         <form method="post" action="{% url 'login' %}">
