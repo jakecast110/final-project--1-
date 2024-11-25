@@ -4,6 +4,11 @@
 
 {% block content %}
     <h1>Welcome, {{ user_name }} ({{ role }})</h1>
+    {% if messages %}
+        {% for message in messages %}
+        <p>{{message}}</p>
+        {% endfor %}
+    {% endif %}
     <h2>Available Surveys</h2>
 
     <div class="survey-list">

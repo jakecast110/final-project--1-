@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST
 from .forms import UserRegistrationForm, SurveyForm, QuestionForm, OptionFormSet
 from .models import Survey, Question, Option, Response, Answer, UserProfile
 from django.contrib.auth.models import User
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, modelformset_factory
 from django.contrib import messages
 
 
@@ -97,8 +97,10 @@ def creator_dashboard(request):
 @login_required
 def taker_dashboard(request):
     surveys = Survey.objects.filter(is_published=True)
-    return render(request, 'survey/taker_dashboard.html', {'surveys': surveys, 'role': 'Survey Taker'})
-
+    return render(request, 'survey/taker_dashboard.html', {
+        'surveys': surveys,
+        'role': 'Survey Taker'
+    })
 
 # Create a new survey
 
@@ -286,7 +288,8 @@ def republish_survey(request, survey_id):
 @login_required
 def take_survey(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, is_published=True)
-    questions = survey.questions.filter(deleted_at__isnull=True).prefetch_related("options")
+    questions = Question.objects.filter(survey_id=survey_id).prefetch_related("options")
+    #options = Option.objects.filter(survey_id=survey_id) #Need to filter by survey and question
     return render(request, 'survey/take_survey.html', {'survey': survey, 'questions': questions})
 
 @login_required
@@ -298,19 +301,12 @@ def survey_list(request):
 @login_required
 def submit_response(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, is_published=True)
+    answers={}
     if request.method == 'POST':
-        answers = {}
-        for question in survey.questions.filter(deleted_at__isnull=True):
-            selected_options = request.POST.getlist(str(question.id))
-            answers[question.id] = selected_options
-        response = Response.objects.create(survey=survey, user=request.user.userprofile)
-        for question_id, option_ids in answers.items():
-            question = Question.objects.get(id=question_id)
-            options = Option.objects.filter(id__in=option_ids)
-            answer = Answer.objects.create(response=response, question=question)
-            answer.selected_options.set(options)
+        responses = {str(question.id): request.POST.get(str(question.id)) for question in survey.questions.all()}
+        Response.objects.create(survey=survey, user=request.user.userprofile, answers=responses)
         messages.success(request, "Survey response submitted successfully!")
-        return redirect('survey_list')
+        return redirect('taker_dashboard')
     return redirect('take_survey', survey_id=survey_id)
 
 @login_required
