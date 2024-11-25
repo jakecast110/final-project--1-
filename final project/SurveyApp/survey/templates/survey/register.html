@@ -7,6 +7,159 @@
     <title>Survey App - Register</title>
     <link rel="stylesheet" href="{% static 'SurveyApp/styles.css' %}">
     <style>
+        /* Stretch background image to cover the whole page */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .container {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url("{% static 'images/t6.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        form {
+            width: 100%;
+            max-width: 500px; /* Adjust this value as needed */
+            padding: 20px;
+            background-color: transparent; /* Semi-transparent white background */
+            border-radius: 10px;
+        }
+
+        .form-group {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .password-match {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #ff4d4d;
+        }
+        
+        .password-match.valid {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form method="post" action="{% url 'register' %}">
+            <h1>Survey App</h1>
+            <h2>Register</h2>
+            
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">Username:</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="error">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_email">Email Address:</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="error">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password">Password:</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="error">{{ form.password.errors.0 }}</div>
+                {% endif %}
+                <ul class="password-requirements">
+                    <li id="length">At least 8 characters</li>
+                    <li id="capital">At least one uppercase letter</li>
+                    <li id="number">At least one number</li>
+                    <li id="special">At least one special character (!@#$%^&*(),.?":{}|<>)</li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <label for="id_confirm_password">Re-enter Password:</label>
+                {{ form.confirm_password }}
+                {% if form.confirm_password.errors %}
+                    <div class="error">{{ form.confirm_password.errors.0 }}</div>
+                {% endif %}
+                <div id="password-match-message" class="password-match"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_role">Role:</label>
+                <select name="role" id="id_role">
+                    <option value="Survey Creator">Survey Creator</option>
+                    <option value="Survey Taker">Survey Taker</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+
+            <div class="login-link">
+                <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script src="{% static 'SurveyApp/script.js' %}"></script>
+    <script>
+        // Function to validate password match
+        function validatePassword() {
+            const password = document.getElementById("id_password").value;
+            const confirmPassword = document.getElementById("id_confirm_password").value;
+
+            const matchMessage = document.getElementById("password-match-message");
+            
+            if (password && confirmPassword) {
+                if (password === confirmPassword) {
+                    matchMessage.textContent = "Passwords match!";
+                    matchMessage.classList.add("valid");
+                } else {
+                    matchMessage.textContent = "Passwords do not match.";
+                    matchMessage.classList.remove("valid");
+                }
+            } else {
+                matchMessage.textContent = "";
+            }
+        }
+
+        // Add event listeners for password inputs
+        document.getElementById("id_password").addEventListener("input", validatePassword);
+        document.getElementById("id_confirm_password").addEventListener("input", validatePassword);
+    </script>
+</body>
+</html>
+
+
+
+{% comment %} {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey App - Register</title>
+    <link rel="stylesheet" href="{% static 'SurveyApp/styles.css' %}">
+    <style>
         /* Additional styles specific to the register page */
         .password-match {
             margin-top: 10px;
@@ -95,7 +248,7 @@
         document.getElementById("id_confirm_password").addEventListener("input", validatePassword);
     </script>
 </body>
-</html>
+</html> {% endcomment %}
 
 
 {% comment %} {% load static %}
