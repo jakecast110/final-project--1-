@@ -282,9 +282,9 @@ def republish_survey(request, survey_id):
     })
 
 
-<<<<<<< HEAD
+
 # View survey results
-=======
+
 # Take a survey
 @login_required
 def take_survey(request, survey_id):
