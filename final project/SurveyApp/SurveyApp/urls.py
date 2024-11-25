@@ -23,3 +23,4 @@ urlpatterns = [
     path('', lambda request: redirect('login/')),  # Redirect the root URL to login page
     path('login/', include('survey.urls')),
 ]
+

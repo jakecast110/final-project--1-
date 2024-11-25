@@ -1,49 +1,105 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey App - Login</title>
+    <title>Survey App</title>
+    <!-- External CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{% static 'SurveyApp/styles.css' %}">
+    <!-- Local JavaScript -->
+    <script src="{% static 'SurveyApp/script.js' %}" defer></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Stretch background image to cover the whole page */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .container {
+            min-height: 100vh;
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
+            background-image: url("{% static 'images/t6.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
         }
-        .container {
-            width: 300px;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h1 {
-            margin-bottom: 20px;
-        }
-        input {
+
+        form {
             width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            box-sizing: border-box;
+            max-width: 400px; /* Adjust this value as needed */
+            padding: 20px;
+            background-color: transparent; /* Fully transparent background */
+            border-radius: 10px;
         }
+
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
         button {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
         }
-        .register-link {
-            margin-top: 10px;
-            font-size: 0.9em;
+        
+        h1, h2 {
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Survey App</h1>
+        <form method="post" action="{% url 'login' %}">
+            <h1>Group No. 10 presents - Survey System as TDS Project</h1>
+            <h2>Login</h2>
+
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <button type="submit">Login</button>
+
+            <div class="register-link">
+                <p>New user? <a href="{% url 'register' %}">Register here</a></p>
+            </div>
+
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>
+
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey App</title>
+    <!-- External CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{% static 'SurveyApp/styles.css' %}">
+    <!-- Local JavaScript -->
+    <script src="{% static 'SurveyApp/script.js' %}" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Group No. 10 presents - Survey System as TDS Project</h1>
         <h2>Login</h2>
         
         <form method="post" action="{% url 'login' %}">
@@ -65,4 +121,4 @@
         {% endif %}
     </div>
 </body>
-</html>
+</html> {% endcomment %}
