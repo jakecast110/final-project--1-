@@ -7,8 +7,8 @@ from .models import UserProfile, Survey, Question, Option
 # User Registration Form with role selection
 class UserRegistrationForm(forms.ModelForm):
     ROLE_CHOICES = [
-        ('creator', 'Survey Creator'),
-        ('taker', 'Survey Taker'),
+        ('Survey Creator', 'creator'),
+        ('Survey Taker', 'taker'),
     ]
 
     password = forms.CharField(
@@ -22,7 +22,7 @@ class UserRegistrationForm(forms.ModelForm):
     role = forms.ChoiceField(
         choices=ROLE_CHOICES,
         label="Role",
-        widget=forms.RadioSelect,
+        widget=forms.Select,
         required=True,
     )
 

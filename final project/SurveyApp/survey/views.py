@@ -19,6 +19,7 @@ def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         role = request.POST.get('role', 'taker')  # Default role: Survey Taker
+        print(role)
         if form.is_valid():
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
@@ -36,6 +37,7 @@ def register(request):
                 messages.success(request, "Registration successful! Please log in.")
                 return redirect('login')
         else:
+            print(request.POST)
             messages.error(request, "Please correct the errors.")
     else:
         form = UserRegistrationForm()
@@ -64,7 +66,7 @@ def home(request):
         profile = UserProfile.objects.get(user=request.user)
         if 'Survey Creator' in profile.roles:
             return redirect('creator_dashboard')
-        elif 'taker' in profile.roles:
+        elif 'Survey Taker' in profile.roles:
             return redirect('taker_dashboard')
         else:
             messages.error(request, "No valid role found. Please contact support.")
@@ -291,8 +293,21 @@ def republish_survey(request, survey_id):
 def take_survey(request, survey_id):
     profile = UserProfile.objects.get(user=request.user)
     survey = get_object_or_404(Survey, id=survey_id, is_published=True)
-    questions = survey.questions.filter(deleted_at__isnull=True).prefetch_related("options")
-    return render(request, 'survey/take_survey.html', {'survey': survey, 'questions': questions})
+    questions = Question.objects.filter(survey_id=survey_id)
+    options = Option.objects.filter(survey_id=survey_id) 
+    response = Response.objects.filter(survey_id=survey_id)
+    #get list of users in responses of surveys
+    users=[]
+    for rsp in response:
+        users.append(rsp.user_id)
+    if request.user.id in users:
+        return render(request, 'survey/taken_survey.html')
+    return render(request, 'survey/take_survey.html', {'survey': survey, 
+                                                       'questions': questions, 
+                                                       'options': options, 
+                                                       'profile': profile, 
+                                                       'response': response,
+                                                       'users':users})
 
 @login_required
 def survey_list(request):
@@ -313,9 +328,10 @@ def submit_response(request, survey_id):
             question = Question.objects.get(id=question_id)
             options = Option.objects.filter(id__in=option_ids)
             answer = Answer.objects.create(response=response, question=question)
+            print(f"Answer id is {answer.id}")
             answer.selected_options.set(options)
         messages.success(request, "Survey response submitted successfully!")
-        return redirect('survey_list')
+        return redirect('taker_dashboard')
     return redirect('take_survey', survey_id=survey_id)
 
 @login_required

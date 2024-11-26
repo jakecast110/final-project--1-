@@ -72,6 +72,7 @@ class Option(models.Model):
     option_text = models.CharField(max_length=255, null=True)
     updated_at = models.DateTimeField(auto_now=True)  # Tracks when the option was last updated
     deleted_at = models.DateTimeField(null=True, blank=True)  # Soft delete
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
 
     def delete(self, *args, **kwargs):
         """Soft delete the option."""
@@ -103,9 +104,17 @@ class Answer(models.Model):
 
     def save(self, *args, **kwargs):
         # Ensure selected options belong to the same question
+
+        if not self.pk:  # Check if the instance has not been saved yet
+            super().save(*args, **kwargs)
+            return
+
         if self.selected_options.exists() and not all(option.question == self.question for option in self.selected_options.all()):
             raise ValueError("All selected options must belong to the same question.")
+    
+    # Save again to ensure any other changes are persisted
         super().save(*args, **kwargs)
+        return
 
     def __str__(self):
         return f"Answer to {self.question}"
