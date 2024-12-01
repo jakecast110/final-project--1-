@@ -199,8 +199,11 @@ def edit_question(request, survey_id, question_id=None):
             question.save()
 
             # Save the options
-            option_formset.instance = question
-            option_formset.save()
+            options = option_formset.save(commit=False)
+            for option in options:
+                option.survey = survey
+                option.save()
+            option_formset.save_m2m()
 
             messages.success(request, "Question and options saved successfully!")
             return redirect('edit_survey', survey_id=survey.id)
