@@ -368,7 +368,7 @@ def view_results(request, survey_id):
 
     for question in questions:
         total_responses = Response.objects.filter(survey=survey).count()
-        options = question.options.annotate(vote_count=Count('response'))
+        options = question.options.annotate(vote_count=Count('answer__response', distinct=True))
         statistics[question.question_text] = [
             (option.option_text, option.vote_count, (option.vote_count / total_responses) * 100 if total_responses else 0)
             for option in options
