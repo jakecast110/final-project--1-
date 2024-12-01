@@ -154,6 +154,9 @@ def add_questions(request, survey_id):
             messages.success(request, "Questions added successfully!")
             return redirect('creator_dashboard')
         else:
+            print(question_formset.errors)
+            print(question_formset.management_form.errors)
+            print(request.POST)
             messages.error(request, "Please correct the errors below.")
     else:
         question_formset = QuestionFormSet(queryset=survey.questions.all())
@@ -348,7 +351,7 @@ def republish_survey(request, survey_id):
     questions = survey.questions.filter(deleted_at__isnull=True)
     statistics = {}
     for question in questions:
-        options = question.options.annotate(vote_count=Count('response'))
+        options = question.options.annotate(vote_count=Count('answer__response', distinct=True))
         statistics[question.question_text] = [
             (option.option_text, option.vote_count) for option in options
         ]
