@@ -8,7 +8,7 @@
 
     <!-- Add a New Question -->
     <h3>Add a New Question</h3>
-    <form method="post">
+    <form method="get" action="{% url 'add_questions' survey.id %}">
         {% csrf_token %}
         {{ question_form.as_p }}
         {{ option_formset.management_form }}

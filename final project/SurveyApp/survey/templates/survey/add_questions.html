@@ -12,6 +12,7 @@
         <div id="question-container">
             {% for form in question_formset %}
                 <div class="question-item mb-4 border p-3">
+                    {{ form.id }}
                     <label><strong>Question {{ forloop.counter }}:</strong></label>
                     {{ form.question_text.errors }}
                     {{ form.question_text }}
