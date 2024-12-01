@@ -3,38 +3,147 @@
 {% block title %}Republish Survey{% endblock %}
 
 {% block content %}
-    <h2>Republish Survey: {{ survey.title }}</h2>
-    <p>{{ survey.description }}</p>
+<div class="form-container">
+    <h2 class="text-center">Republish Survey: {{ survey.title }}</h2>
+    <p class="text-center text-muted">{{ survey.description }}</p>
 
     <!-- Aggregated Statistics -->
-    <h3>Wisdom of the Crowd: Aggregated Insights</h3>
+    <h3 class="text-center mt-4">Wisdom of the Crowd: Aggregated Insights</h3>
     {% if statistics %}
-        <ul>
+        <div class="statistics-container">
             {% for question_text, options in statistics.items %}
-                <li>
-                    <strong>{{ question_text }}</strong>
+                <div class="question-block mb-4">
+                    <h4 class="question-title">{{ question_text }}</h4>
                     {% if options %}
-                        <ul>
+                        <ul class="option-list">
                             {% for option_text, vote_count in options %}
-                                <li>{{ option_text }}: {{ vote_count }} votes</li>
+                                <li>{{ option_text }}: <span class="vote-count">{{ vote_count }}</span> votes</li>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p>No responses recorded for this question.</p>
+                        <p class="no-responses">No responses recorded for this question.</p>
                     {% endif %}
-                </li>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
-        <p>No previous responses available for this survey.</p>
+        <p class="no-statistics text-center">No previous responses available for this survey.</p>
     {% endif %}
 
     <!-- Button to Confirm Republish -->
-    <form method="post" action="{% url 'republish_survey' survey.id %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Republish Survey</button>
-    </form>
+    <div class="text-center mt-4">
+        <form method="post" action="{% url 'republish_survey' survey.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary modern-btn">Republish Survey</button>
+        </form>
+    </div>
 
     <!-- Back to Dashboard -->
-    <a href="{% url 'creator_dashboard' %}" class="btn btn-link">Back to Dashboard</a>
+    <div class="text-center mt-4">
+        <a href="{% url 'creator_dashboard' %}" class="btn btn-secondary modern-btn">Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+    .form-container {
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+        padding: 30px;
+        border-radius: 10px;
+        margin: auto;
+        max-width: 800px;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    h2, h3, h4 {
+        color: #00c8ff; /* Bright cyan for headers */
+    }
+
+    .text-muted {
+        color: #aaa;
+    }
+
+    .statistics-container {
+        margin-top: 20px;
+    }
+
+    .question-block {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .question-title {
+        color: #00c8ff;
+        margin-bottom: 10px;
+    }
+
+    .option-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .option-list li {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 8px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        font-size: 1em;
+    }
+
+    .vote-count {
+        font-weight: bold;
+        color: #00c8ff;
+    }
+
+    .no-responses, .no-statistics {
+        color: #ff6666;
+        font-weight: bold;
+    }
+
+    .btn {
+        font-family: Arial, sans-serif;
+        font-size: 1em;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #00c8ff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #009acb;
+        transform: scale(1.05);
+    }
+
+    .btn-secondary {
+        background-color: #666;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #555;
+        transform: scale(1.05);
+    }
+
+    .modern-btn:hover {
+        transform: scale(1.03);
+        transition: transform 0.3s ease;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem;
+    }
+</style>
 {% endblock %}

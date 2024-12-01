@@ -3,25 +3,103 @@
 {% block title %}Survey Taker Dashboard{% endblock %}
 
 {% block content %}
-    <h1>Welcome, {{ user_name }} ({{ role }})</h1>
+<div class="form-container">
+    <h1 class="text-center">Welcome, {{ user_name }} ({{ role }})</h1>
     {% if messages %}
-        {% for message in messages %}
-        <p>{{message}}</p>
-        {% endfor %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+                <p class="alert alert-info">{{ message }}</p>
+            {% endfor %}
+        </div>
     {% endif %}
-    <h2>Available Surveys</h2>
+
+    <h2 class="text-center mb-4">Available Surveys</h2>
 
     <div class="survey-list">
         {% if surveys %}
             {% for survey in surveys %}
-                <div class="survey-item">
-                    <h3>{{ survey.title }}</h3>
-                    <p>{{ survey.description }}</p>
-                    <a href="{% url 'take_survey' survey.id %}" class="take-survey">Take Survey</a>
+                <div class="survey-item mb-4 p-3 border rounded">
+                    <h3 class="text-primary">{{ survey.title }}</h3>
+                    <p class="text-muted">{{ survey.description }}</p>
+                    <div class="text-center">
+                        <a href="{% url 'take_survey' survey.id %}" class="btn btn-primary modern-btn">Take Survey</a>
+                    </div>
                 </div>
             {% endfor %}
         {% else %}
-            <p>No surveys are available at the moment.</p>
+            <p class="text-center text-muted">No surveys are available at the moment.</p>
         {% endif %}
     </div>
+</div>
+
+<style>
+    .form-container {
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+        padding: 30px;
+        border-radius: 10px;
+        margin: auto;
+        max-width: 800px;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    h1, h2, h3 {
+        color: #00c8ff; /* Bright cyan for headers */
+    }
+
+    .survey-item {
+        background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .survey-item h3 {
+        font-size: 1.5em;
+        color: #00c8ff;
+    }
+
+    .survey-item p {
+        font-size: 1em;
+        color: #ddd;
+    }
+
+    .btn {
+        font-family: Arial, sans-serif;
+        font-size: 1em;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #00c8ff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #009acb;
+        transform: scale(1.05);
+    }
+
+    .modern-btn:hover {
+        transform: scale(1.03);
+        transition: transform 0.3s ease;
+    }
+
+    .text-muted {
+        color: #aaa;
+    }
+
+    .text-primary {
+        color: #00c8ff;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+</style>
 {% endblock %}

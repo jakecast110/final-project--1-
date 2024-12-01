@@ -3,42 +3,151 @@
 {% block title %}Creator Dashboard{% endblock %}
 
 {% block content %}
-    <h2>Welcome, (Survey Creator)</h2>
+    <style>
+        /* Dashboard-specific styling */
+        .dashboard-container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            margin: 20px auto;
+        }
 
-    <h3>Your Surveys</h3>
-    <a href="{% url 'create_survey' %}" class="btn btn-primary">Create New Survey</a>
+        .dashboard-container h2, .dashboard-container h3 {
+            text-align: center;
+            color: #00d1ff;
+        }
 
-    <ul>
-        {% for survey in surveys %}
-            <li>
-                <strong>{{ survey.title }}</strong>
-                <p>Status: 
-                    {% if survey.is_closed %}
-                        Closed
-                    {% elif survey.is_published %}
-                        Published
-                    {% else %}
-                        Draft
-                    {% endif %}
-                </p>
-                <div>
-                    <a href="{% url 'edit_survey' survey.id %}" class="btn btn-warning btn-sm">Edit</a>
-                    
-                    {% if survey.is_closed %}
-                        <a href="{% url 'republish_survey' survey.id %}" class="btn btn-secondary btn-sm">Republish</a>
-                    {% elif survey.is_published %}
-                        <a href="{% url 'close_survey' survey.id %}" class="btn btn-secondary btn-sm">Close</a>
-                    {% else %}
-                        <a href="{% url 'publish_survey' survey.id %}" class="btn btn-success btn-sm">Publish</a>
-                    {% endif %}
-                    
-                    <a href="{% url 'view_results' survey.id %}" class="btn btn-info btn-sm">View Results</a>
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
+        .survey-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
 
-    {% if not surveys %}
-        <p>No surveys created yet.</p>
-    {% endif %}
+        .survey-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .survey-item strong {
+            font-size: 1.2em;
+            color: #fff;
+        }
+
+        .survey-item p {
+            margin: 5px 0;
+            color: #d1d1d1;
+        }
+
+        .survey-item .btn {
+            margin: 5px 5px 0 0;
+        }
+
+        .center-btn {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #00d1ff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0099cc;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+        }
+    </style>
+
+    <div class="dashboard-container">
+        <h2>Welcome, Survey Creator</h2>
+        <h3>Your Surveys</h3>
+
+        <div class="center-btn">
+            <a href="{% url 'create_survey' %}" class="btn btn-primary">Create New Survey</a>
+        </div>
+
+        <ul class="survey-list">
+            {% for survey in surveys %}
+                <li class="survey-item">
+                    <strong>{{ survey.title }}</strong>
+                    <p>Status: 
+                        {% if survey.is_closed %}
+                            Closed
+                        {% elif survey.is_published %}
+                            Published
+                        {% else %}
+                            Draft
+                        {% endif %}
+                    </p>
+                    <div>
+                        <a href="{% url 'edit_survey' survey.id %}" class="btn btn-warning btn-sm">Edit</a>
+                        
+                        {% if survey.is_closed %}
+                            <a href="{% url 'republish_survey' survey.id %}" class="btn btn-secondary btn-sm">Republish</a>
+                        {% elif survey.is_published %}
+                            <a href="{% url 'close_survey' survey.id %}" class="btn btn-secondary btn-sm">Close</a>
+                        {% else %}
+                            <a href="{% url 'publish_survey' survey.id %}" class="btn btn-success btn-sm">Publish</a>
+                        {% endif %}
+                        
+                        <a href="{% url 'view_results' survey.id %}" class="btn btn-info btn-sm">View Results</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if not surveys %}
+            <p style="text-align: center; color: white;">No surveys created yet.</p>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -1,27 +1,52 @@
 {% extends 'survey/base.html' %}
 
 {% block content %}
-    <h2>{{survey.title}}</h2>
-    <p>{{survey.description}}</p>
-    <form method="POST" action="{% url 'submit_response' survey.id%}">
+    <h2>{{ survey.title }}</h2>
+    <p>{{ survey.description }}</p>
+
+    <form method="POST" action="{% url 'submit_response' survey.id %}">
         {% csrf_token %}
+        
         {% for question in questions %}
-            <p>{{question.question_text}}</p>
-            {% for option in options %}
-                {% if option.question_id == question.id%}
+            <div class="question-block">
+                <h3>{{ question.question_text }}</h3>
+                
+                {% for option in question.options.all %}
                     {% if question.question_type == 'MC' %}
-                        <p><input name='question_{{question.id}}' type="radio" value={{option.id}}>{{option.option_text}}</p>
-                    {% else %}
-                        <p><input name='question_{{question.id}}' type="checkbox" value={{option.id}}>{{option.option_text}}</p>
+                        <!-- Multiple choice: Radio buttons -->
+                        <div class="option">
+                            <label>
+                                <input 
+                                    type="radio" 
+                                    name="question_{{ question.id }}" 
+                                    value="{{ option.id }}">
+                                {{ option.option_text }}
+                            </label>
+                        </div>
+                    {% elif question.question_type == 'CB' %}
+                        <!-- Checkbox questions -->
+                        <div class="option">
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    name="question_{{ question.id }}" 
+                                    value="{{ option.id }}">
+                                {{ option.option_text }}
+                            </label>
+                        </div>
                     {% endif %}
-                {% endif %}
-            {% endfor %}
+                {% endfor %}
+            </div>
         {% endfor %}
-        <input type="submit" name="response_submit" value="Submit Response">
+        
+        <button type="submit" class="btn btn-primary">Submit Response</button>
     </form>
+
     {% if messages %}
-        {% for message in messages %}
-            <p>{{message}}</p>
-        {% endfor %}
+        <div class="messages">
+            {% for message in messages %}
+                <p class="alert">{{ message }}</p>
+            {% endfor %}
+        </div>
     {% endif %}
-    {% endblock %}
+{% endblock %}

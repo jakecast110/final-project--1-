@@ -1,9 +1,80 @@
 {% extends 'survey/base.html' %}
 
 {% block content %}
+<div class="form-container">
+    <h2 class="text-center">{{ survey.title }}</h2>
+    <p class="text-center text-muted">{{ survey.description }}</p>
+    <div class="alert alert-info text-center mt-4">
+        <strong>You have already taken this survey!</strong>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'taker_dashboard' %}" class="btn btn-primary modern-btn">Back to Dashboard</a>
+    </div>
+</div>
 
-<h2>{{survey.title}}</h2>
-<p>{{survey.description}}</p>
-<p>You have already taken this survey!</p>
+<style>
+    .form-container {
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+        padding: 30px;
+        border-radius: 10px;
+        margin: auto;
+        max-width: 800px;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
 
+    h2 {
+        color: #00c8ff; /* Bright cyan for headers */
+    }
+
+    p {
+        font-size: 1.1em;
+        color: #ddd;
+    }
+
+    .alert {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn {
+        font-family: Arial, sans-serif;
+        font-size: 1em;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #00c8ff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #009acb;
+        transform: scale(1.05);
+    }
+
+    .modern-btn:hover {
+        transform: scale(1.03);
+        transition: transform 0.3s ease;
+    }
+
+    .text-muted {
+        color: #aaa;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem;
+    }
+</style>
 {% endblock %}

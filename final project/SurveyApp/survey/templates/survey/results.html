@@ -1,12 +1,24 @@
-<h2>Survey Results: {{ survey.title }}</h2>
-<p>{{ survey.description }}</p>
+{% extends 'survey/base.html' %}
 
-<h3>Question Statistics</h3>
-{% for question, options in statistics.items %}
-    <h4>{{ question }}</h4>
+{% block content %}
+    <h2>Survey Results: {{ survey.title }}</h2>
+    <p>{{ survey.description }}</p>
+
+    <h3>Question Statistics</h3>
     <ul>
-        {% for option, vote_count, percentage in options %}
-            <li>{{ option }}: {{ vote_count }} votes ({{ percentage }}%)</li>
+        {% for question in statistics %}
+            <li>
+                <strong>{{ question.question_text }}</strong>
+                <ul>
+                    {% for option in question.options %}
+                        <li>
+                            {{ option.option_text }} - 
+                            {{ option.vote_count }} votes 
+                            ({{ option.percentage|floatformat:2 }}%)
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
         {% endfor %}
     </ul>
-{% endfor %}
+{% endblock %}

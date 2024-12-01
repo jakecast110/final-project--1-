@@ -4,20 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey App - Register</title>
-    <link rel="stylesheet" href="{% static 'SurveyApp/styles.css' %}">
+    <title>Survey System | Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* Stretch background image to cover the whole page */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
+            font-family: 'Roboto', sans-serif;
         }
 
         .container {
             min-height: 100vh;
-            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,42 +24,117 @@
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
+            padding: 20px;
         }
 
         form {
             width: 100%;
-            max-width: 500px; /* Adjust this value as needed */
-            padding: 20px;
-            background-color: transparent; /* Semi-transparent white background */
+            max-width: 400px;
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black */
             border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #00d1ff;
+            margin-bottom: 20px;
         }
 
         .form-group {
-            width: 100%;
             margin-bottom: 15px;
         }
 
         input, select {
             width: 100%;
             padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
             box-sizing: border-box;
         }
 
-        .password-match {
+        input {
+            background-color: #f9f9f9;
+            color: black;
+        }
+
+        select {
+            background-color: #f9f9f9;
+            color: black;
+        }
+
+        .password-requirements {
             margin-top: 10px;
             font-size: 0.9em;
             color: #ff4d4d;
         }
-        
+
+        .password-requirements li {
+            list-style: none;
+            margin-bottom: 5px;
+        }
+
+        .password-requirements li.valid {
+            color: #4CAF50;
+        }
+
+        .password-match {
+            font-size: 0.9em;
+            margin-top: 5px;
+            color: #ff4d4d;
+        }
+
         .password-match.valid {
             color: #4CAF50;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #00d1ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: not-allowed;
+        }
+
+        button.enabled {
+            cursor: pointer;
+            background-color: #0099cc;
+        }
+
+        button:hover.enabled {
+            background-color: #0077aa;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .login-link a {
+            color: #00d1ff;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #d32f2f;
+            font-size: 0.85em;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <form method="post" action="{% url 'register' %}">
-            <h1>Survey App</h1>
+            <h1>Survey System</h1>
             <h2>Register</h2>
             
             {% csrf_token %}
@@ -87,7 +161,7 @@
                 {% if form.password.errors %}
                     <div class="error">{{ form.password.errors.0 }}</div>
                 {% endif %}
-                <ul class="password-requirements">
+                <ul class="password-requirements" id="password-requirements">
                     <li id="length">At least 8 characters</li>
                     <li id="capital">At least one uppercase letter</li>
                     <li id="number">At least one number</li>
@@ -112,7 +186,7 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="submit" id="register-button" disabled>Register</button>
 
             <div class="login-link">
                 <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
@@ -120,232 +194,67 @@
         </form>
     </div>
 
-    <script src="{% static 'SurveyApp/script.js' %}"></script>
     <script>
-        // Function to validate password match
-        function validatePassword() {
-            const password = document.getElementById("id_password").value;
-            const confirmPassword = document.getElementById("id_confirm_password").value;
-
+        document.addEventListener("DOMContentLoaded", function () {
+            const passwordField = document.getElementById("id_password");
+            const confirmPasswordField = document.getElementById("id_confirm_password");
+            const registerButton = document.getElementById("register-button");
             const matchMessage = document.getElementById("password-match-message");
-            
-            if (password && confirmPassword) {
-                if (password === confirmPassword) {
+
+            const requirements = {
+                length: document.getElementById("length"),
+                capital: document.getElementById("capital"),
+                number: document.getElementById("number"),
+                special: document.getElementById("special"),
+            };
+
+            function validatePassword() {
+                const password = passwordField.value;
+                let valid = true;
+
+                requirements.length.classList.toggle("valid", password.length >= 8);
+                valid &= password.length >= 8;
+
+                requirements.capital.classList.toggle("valid", /[A-Z]/.test(password));
+                valid &= /[A-Z]/.test(password);
+
+                requirements.number.classList.toggle("valid", /\d/.test(password));
+                valid &= /\d/.test(password);
+
+                requirements.special.classList.toggle("valid", /[!@#$%^&*(),.?":{}|<>]/.test(password));
+                valid &= /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+                return !!valid;
+            }
+
+            function checkPasswordMatch() {
+                const password = passwordField.value;
+                const confirmPassword = confirmPasswordField.value;
+
+                if (confirmPassword && password === confirmPassword) {
                     matchMessage.textContent = "Passwords match!";
                     matchMessage.classList.add("valid");
+                    return true;
                 } else {
                     matchMessage.textContent = "Passwords do not match.";
                     matchMessage.classList.remove("valid");
+                    return false;
                 }
-            } else {
-                matchMessage.textContent = "";
             }
-        }
 
-        // Add event listeners for password inputs
-        document.getElementById("id_password").addEventListener("input", validatePassword);
-        document.getElementById("id_confirm_password").addEventListener("input", validatePassword);
+            function toggleRegisterButton() {
+                if (validatePassword() && checkPasswordMatch()) {
+                    registerButton.disabled = false;
+                    registerButton.classList.add("enabled");
+                } else {
+                    registerButton.disabled = true;
+                    registerButton.classList.remove("enabled");
+                }
+            }
+
+            passwordField.addEventListener("input", toggleRegisterButton);
+            confirmPasswordField.addEventListener("input", toggleRegisterButton);
+        });
     </script>
 </body>
 </html>
-
-
-
-{% comment %} {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey App - Register</title>
-    <link rel="stylesheet" href="{% static 'SurveyApp/styles.css' %}">
-    <style>
-        /* Additional styles specific to the register page */
-        .password-match {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #ff4d4d;
-        }
-        .password-match.valid {
-            color: #4CAF50;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Survey App</h1>
-        <h2>Register</h2>
-
-        <form method="post" action="{% url 'register' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="id_username">Username:</label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                    <div class="error">{{ form.username.errors.0 }}</div>
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label for="id_email">Email Address:</label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                    <div class="error">{{ form.email.errors.0 }}</div>
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label for="id_password">Password:</label>
-                {{ form.password }}
-                {% if form.password.errors %}
-                    <div class="error">{{ form.password.errors.0 }}</div>
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label for="id_confirm_password">Re-enter Password:</label>
-                {{ form.confirm_password }}
-                {% if form.confirm_password.errors %}
-                    <div class="error">{{ form.confirm_password.errors.0 }}</div>
-                {% endif %}
-                <div id="password-match-message" class="password-match"></div>
-            </div>
-            <div class="form-group">
-                <label for="id_role">Role:</label>
-                <select name="role" id="id_role">
-                    <option value="creator">Survey Creator</option>
-                    <option value="taker">Survey Taker</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
-
-        <div class="login-link">
-            <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
-        </div>
-    </div>
-
-    <script src="{% static 'SurveyApp/script.js' %}"></script>
-    <script>
-        // Function to validate password match
-        function validatePassword() {
-            const password = document.getElementById("id_password").value;
-            const confirmPassword = document.getElementById("id_confirm_password").value;
-
-            const matchMessage = document.getElementById("password-match-message");
-            if (password && confirmPassword) {
-                if (password === confirmPassword) {
-                    matchMessage.textContent = "Passwords match!";
-                    matchMessage.classList.add("valid");
-                } else {
-                    matchMessage.textContent = "Passwords do not match.";
-                    matchMessage.classList.remove("valid");
-                }
-            } else {
-                matchMessage.textContent = "";
-            }
-        }
-
-        // Add event listeners for password inputs
-        document.getElementById("id_password").addEventListener("input", validatePassword);
-        document.getElementById("id_confirm_password").addEventListener("input", validatePassword);
-    </script>
-</body>
-</html> {% endcomment %}
-
-
-{% comment %} {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Survey App - Register</title>
-    <link rel="stylesheet" href="{% static 'SurveyApp/styles.css' %}">
-    <style>
-        /* Additional styles specific to the register page */
-        .password-requirements {
-            margin-top: 10px;
-            text-align: left;
-            font-size: 0.9em;
-        }
-        .password-requirements li {
-            list-style-type: none;
-            margin-bottom: 5px;
-            color: #ff4d4d;
-        }
-        .password-requirements li.valid {
-            color: #4CAF50;
-        }
-        .password-match {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #ff4d4d;
-        }
-        .password-match.valid {
-            color: #4CAF50;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Survey App</h1>
-        <h2>Register</h2>
-
-        <form method="post" action="{% url 'register' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="id_username">Username:</label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                    <div class="error">{{ form.username.errors.0 }}</div>
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label for="id_email">Email Address:</label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                    <div class="error">{{ form.email.errors.0 }}</div>
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label for="id_password">Password:</label>
-                {{ form.password }}
-                {% if form.password.errors %}
-                    <div class="error">{{ form.password.errors.0 }}</div>
-                {% endif %}
-                <ul class="password-requirements">
-                    <li id="length">At least 8 characters</li>
-                    <li id="capital">At least one uppercase letter</li>
-                    <li id="number">At least one number</li>
-                    <li id="special">At least one special character (!@#$%^&*(),.?":{}|<>)</li>
-                </ul>
-            </div>
-            <div class="form-group">
-                <label for="id_confirm_password">Re-enter Password:</label>
-                {{ form.confirm_password }}
-                {% if form.confirm_password.errors %}
-                    <div class="error">{{ form.confirm_password.errors.0 }}</div>
-                {% endif %}
-                <div id="password-match-message" class="password-match"></div>
-            </div>
-            <div class="form-group">
-                <label for="id_role">Role:</label>
-                <select name="role" id="id_role">
-                    <option value="Survey Creator">Survey Creator</option>
-                    <option value="Survey Taker">Survey Taker</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
-
-        <div class="login-link">
-            <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
-        </div>
-    </div>
-
-    <script src="{% static 'SurveyApp/script.js' %}"></script>
-    <script>
-        // Add event listeners for password inputs
-        document.getElementById("id_password").addEventListener("input", validatePassword);
-        document.getElementById("id_confirm_password").addEventListener("input", validatePassword);
-    </script>
-</body>
-</html> {% endcomment %}

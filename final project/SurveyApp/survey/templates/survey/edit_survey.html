@@ -3,12 +3,13 @@
 {% block title %}Edit Survey{% endblock %}
 
 {% block content %}
-    <h2>Edit Survey: {{ survey.title }}</h2>
-    <p>{{ survey.description }}</p>
+<div class="form-container">
+    <h2 class="text-center">Edit Survey: {{ survey.title }}</h2>
+    <p class="text-center">{{ survey.description }}</p>
 
     <!-- Add a New Question -->
-    <h3>Add a New Question</h3>
-    <form method="post">
+    <h3 class="text-center">Add a New Question</h3>
+    <form method="post" class="form-style">
         {% csrf_token %}
         {{ question_form.as_p }}
         {{ option_formset.management_form }}
@@ -20,40 +21,111 @@
                 </div>
             {% endfor %}
         </div>
-        <button type="submit" class="btn btn-primary">Add Question</button>
+        <button type="submit" class="btn btn-primary modern-btn">Add Question</button>
     </form>
 
     <!-- List of Existing Questions -->
-    <h3>Existing Questions</h3>
-    <ul>
+    <h3 class="text-center mt-4">Existing Questions</h3>
+    <div class="question-list">
         {% for question in questions %}
-            <li>
+            <div class="question-item mb-3 p-3">
                 <strong>{{ question.question_text }}</strong> ({{ question.get_question_type_display }})
-                <ul>
+                <ul class="option-list">
                     {% for option in question.options.all %}
                         <li>{{ option.option_text }}</li>
                     {% endfor %}
                 </ul>
-                <a href="{% url 'edit_question' survey.id question.id %}" class="btn btn-warning btn-sm">Edit</a>
-                <a href="{% url 'delete_question' survey.id question.id %}" class="btn btn-danger btn-sm">Delete</a>
-            </li>
+                <div class="button-group mt-2">
+                    <a href="{% url 'edit_question' survey.id question.id %}" class="btn modern-btn btn-sm" style="background-color: #ffc107; color: white;">Edit</a>
+                    <a href="{% url 'delete_question' survey.id question.id %}" class="btn modern-btn btn-sm" style="background-color: #ff4d4d; color: white;">Delete</a>
+                </div>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 
     <!-- Publish or Close Survey -->
-    <div class="mt-4">
+    <div class="mt-4 text-center">
         {% if not survey.is_published %}
-            <form method="post" action="{% url 'publish_survey' survey.id %}">
+            <form method="post" action="{% url 'publish_survey' survey.id %}" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-success">Publish Survey</button>
+                <button type="submit" class="btn btn-primary modern-btn">Publish Survey</button>
             </form>
         {% else %}
-            <form method="post" action="{% url 'close_survey' survey.id %}">
+            <form method="post" action="{% url 'close_survey' survey.id %}" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-secondary">Close Survey</button>
+                <button type="submit" class="btn modern-btn" style="background-color: #666; color: white;">Close Survey</button>
             </form>
         {% endif %}
     </div>
 
-    <a href="{% url 'creator_dashboard' %}" class="btn btn-link mt-3">Back to Dashboard</a>
+    <a href="{% url 'creator_dashboard' %}" class="btn modern-btn mt-3" style="background-color: #666; color: white;">Back to Dashboard</a>
+</div>
+
+<style>
+    .form-container {
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+        padding: 30px;
+        border-radius: 10px;
+        margin: auto;
+        max-width: 800px;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    h2, h3, h4 {
+        color: #00c8ff; /* Bright cyan for headers */
+    }
+
+    .form-style {
+        margin-bottom: 20px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1em;
+    }
+
+    button {
+        font-family: Arial, sans-serif;
+        font-size: 1em;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .modern-btn:hover {
+        transform: scale(1.03);
+        transition: transform 0.3s ease;
+    }
+
+    .question-item {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    .option-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 10px 0;
+    }
+
+    .option-list li {
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 5px 10px;
+        margin: 5px 0;
+        border-radius: 5px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+    }
+</style>
 {% endblock %}

@@ -3,51 +3,161 @@
 {% block title %}Edit Question{% endblock %}
 
 {% block content %}
-    <h2>Edit Question</h2>
+<div class="form-container">
+    <h2 class="text-center mb-4">Edit Question</h2>
 
-    <form method="post">
+    <form method="post" id="edit-question-form" class="form-style">
         {% csrf_token %}
-        {{ question_form.as_p }}
 
-        <h4>Options:</h4>
-        <div id="options-container">
+        <!-- Question Form -->
+        <div class="question-block mb-4 p-3 rounded">
+            <h4>Question Details:</h4>
+            {{ question_form.non_field_errors }}
+            <div class="mb-3">
+                {{ question_form.question_text.label_tag }}
+                {{ question_form.question_text }}
+                {{ question_form.question_text.errors }}
+            </div>
+            <div class="mb-3">
+                {{ question_form.question_type.label_tag }}
+                {{ question_form.question_type }}
+                {{ question_form.question_type.errors }}
+            </div>
+        </div>
+
+        <!-- Options Section -->
+        <h4 class="mb-3">Options:</h4>
+        <div id="options-container" class="mb-4">
             {{ option_formset.management_form }}
             {% for form in option_formset %}
-                <div class="option-form">
-                    {{ form.as_p }}
+                <div class="option-form mb-3 border p-3 rounded">
+                    <h5>Option {{ forloop.counter }}:</h5>
+                    {{ form.non_field_errors }}
+                    <div class="mb-2">
+                        {{ form.option_text.label_tag }}
+                        {{ form.option_text }}
+                        {{ form.option_text.errors }}
+                    </div>
+                    <div class="form-check">
+                        {{ form.DELETE }} {{ form.DELETE.label_tag }}
+                    </div>
                 </div>
             {% endfor %}
         </div>
 
-        <!-- Add Option Button -->
-        <button type="button" id="add-option-btn" class="btn btn-secondary">Add Option</button>
+        <!-- Buttons for Adding Option and Saving Changes -->
+        <div class="mb-4 text-center">
+            <button type="button" id="add-option-btn" class="btn btn-secondary modern-btn">Add Option</button>
+        </div>
 
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary modern-btn">Save Changes</button>
+        </div>
     </form>
 
-    <a href="{% url 'edit_survey' survey.id %}" class="btn btn-link mt-3">Back to Survey</a>
+    <!-- Back to Survey Link -->
+    <div class="text-center mt-4">
+        <a href="{% url 'edit_survey' survey.id %}" class="btn btn-secondary modern-btn">Back to Survey</a>
+    </div>
+</div>
 
-    <script>
-        // JavaScript to dynamically add more options
-        document.getElementById('add-option-btn').addEventListener('click', function() {
-            const optionsContainer = document.getElementById('options-container');
-            const totalForms = document.getElementById('id_options-TOTAL_FORMS');  // Update management form total
-            const currentIndex = parseInt(totalForms.value);
+<!-- JavaScript for Dynamic Option Management -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const optionsContainer = document.getElementById("options-container");
+        const addOptionButton = document.getElementById("add-option-btn");
+        const totalForms = document.getElementById("id_options-TOTAL_FORMS");
 
-            // Clone the last option form
-            const emptyForm = document.querySelector('.option-form').cloneNode(true);
-
-            // Update the cloned form's input names and IDs
-            emptyForm.innerHTML = emptyForm.innerHTML.replace(/__prefix__/g, currentIndex);
+        // Function to add a new option dynamically
+        addOptionButton.addEventListener("click", function () {
+            const currentIndex = parseInt(totalForms.value); // Current number of forms
+            const newFormTemplate = document.querySelector('.option-form').cloneNode(true); // Clone the last form
 
             // Clear the values in the cloned form
-            emptyForm.querySelectorAll('input').forEach(input => input.value = '');
+            newFormTemplate.querySelectorAll('input').forEach(input => {
+                input.name = input.name.replace(/-\d+-/g, `-${currentIndex}-`);
+                input.id = input.id.replace(/-\d+-/g, `-${currentIndex}-`);
+                if (!input.type.includes("checkbox")) {
+                    input.value = ""; // Clear input value
+                } else {
+                    input.checked = false; // Reset checkbox
+                }
+            });
 
-            // Append the new form
-            optionsContainer.appendChild(emptyForm);
+            // Append the new form to the container
+            optionsContainer.appendChild(newFormTemplate);
 
-            // Increment the total forms count
+            // Update the total forms count
             totalForms.value = currentIndex + 1;
         });
-    </script>
+    });
+</script>
+
+<style>
+    .form-container {
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+        padding: 30px;
+        border-radius: 10px;
+        margin: auto;
+        max-width: 800px;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    h2, h4, h5 {
+        color: #00c8ff; /* Bright cyan for headers */
+    }
+
+    .form-style {
+        margin-bottom: 20px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1em;
+    }
+
+    button {
+        font-family: Arial, sans-serif;
+        font-size: 1em;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .modern-btn:hover {
+        transform: scale(1.03);
+        transition: transform 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #00c8ff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #009acb;
+    }
+
+    .btn-secondary {
+        background-color: #666;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #555;
+    }
+
+    .option-form {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+</style>
 {% endblock %}
