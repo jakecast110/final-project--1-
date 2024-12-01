@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="form-container">
-    <h2 class="text-center mb-4">Edit Question</h2>
+    <h2 class="text-center mb-4">{% if question_form.instance.pk %}Edit Question{% else %}Add a New Question{% endif %}</h2>
 
     <form method="post" id="edit-question-form" class="form-style">
         {% csrf_token %}
@@ -30,7 +30,7 @@
         <div id="options-container" class="mb-4">
             {{ option_formset.management_form }}
             {% for form in option_formset %}
-                <div class="option-form mb-3 border p-3 rounded">
+                <div class="option-form mb-3 border p-3 rounded" id="option-{{ forloop.counter }}">
                     <h5>Option {{ forloop.counter }}:</h5>
                     {{ form.non_field_errors }}
                     <div class="mb-2">
@@ -73,15 +73,20 @@
             const currentIndex = parseInt(totalForms.value); // Current number of forms
             const newFormTemplate = document.querySelector('.option-form').cloneNode(true); // Clone the last form
 
-            // Clear the values in the cloned form
+            // Update attributes and reset values
             newFormTemplate.querySelectorAll('input').forEach(input => {
                 input.name = input.name.replace(/-\d+-/g, `-${currentIndex}-`);
                 input.id = input.id.replace(/-\d+-/g, `-${currentIndex}-`);
                 if (!input.type.includes("checkbox")) {
-                    input.value = ""; // Clear input value
+                    input.value = ""; // Clear text input values
                 } else {
                     input.checked = false; // Reset checkbox
                 }
+            });
+
+            // Reset form-specific labels and IDs
+            newFormTemplate.querySelectorAll('label').forEach(label => {
+                label.htmlFor = label.htmlFor.replace(/-\d+-/g, `-${currentIndex}-`);
             });
 
             // Append the new form to the container
@@ -89,6 +94,10 @@
 
             // Update the total forms count
             totalForms.value = currentIndex + 1;
+
+            // Update the option number in the heading
+            const heading = newFormTemplate.querySelector('h5');
+            if (heading) heading.textContent = `Option ${currentIndex + 1}:`;
         });
     });
 </script>

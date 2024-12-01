@@ -139,48 +139,39 @@ from .forms import QuestionForm
 
 @login_required
 def add_questions(request, survey_id):
-    """
-    Add questions to an existing survey, ensuring options are properly linked and saved.
-    """
     survey = get_object_or_404(Survey, id=survey_id, creator=request.user)
-
-    # Define formsets for questions and options
-    OptionFormSet = inlineformset_factory(
-        Question,
-        Option,
-        fields=['option_text'],
-        extra=3,  # Default number of empty option forms
-        can_delete=True,
-        widgets={'option_text': forms.TextInput(attrs={'placeholder': 'Enter option text'})}
-    )
 
     QuestionFormSet = modelformset_factory(
         Question,
         fields=['question_text', 'question_type'],
-        extra=5,  # Default number of empty question forms
+        extra=5,  # Allow 5 extra empty forms for questions
+        can_delete=True,
+    )
+
+    OptionFormSet = inlineformset_factory(
+        Question,
+        Option,
+        fields=['option_text'],
+        extra=3,  # Allow 3 extra empty forms for options
         can_delete=True,
     )
 
     if request.method == 'POST':
-        question_formset = QuestionFormSet(request.POST, queryset=survey.questions.all())
+        question_formset = QuestionFormSet(request.POST, queryset=survey.questions.filter(deleted_at__isnull=True))
 
         if question_formset.is_valid():
-            # Save each question
+            # Save questions
             questions = question_formset.save(commit=False)
             for question in questions:
-                question.survey = survey  # Link question to the survey
+                question.survey = survey
                 question.save()
 
-                # Process the options for the question
+                # Handle options for the question
                 option_formset = OptionFormSet(request.POST, instance=question)
                 if option_formset.is_valid():
-                    options = option_formset.save(commit=False)
-                    for option in options:
-                        option.survey = survey  # Link option to the survey
-                        option.save()
-
+                    option_formset.save()
                 else:
-                    # If option_formset has errors, show them
+                    # Handle option formset errors
                     messages.error(request, f"Errors in options for question: {question.question_text}")
                     return render(request, 'survey/add_questions.html', {
                         'survey': survey,
@@ -188,16 +179,23 @@ def add_questions(request, survey_id):
                         'OptionFormSet': OptionFormSet,
                     })
 
-            # Save many-to-many relationships
-            question_formset.save_m2m()
+            # Check if there are at least 5 questions
+            if survey.questions.filter(deleted_at__isnull=True).count() < 5:
+                messages.error(request, "A survey must have at least 5 questions.")
+                return render(request, 'survey/add_questions.html', {
+                    'survey': survey,
+                    'question_formset': question_formset,
+                    'OptionFormSet': OptionFormSet,
+                })
+
+            # Success message and redirect
             messages.success(request, "Questions and options added successfully!")
             return redirect('creator_dashboard')
         else:
-            messages.error(request, "Please correct the errors in the question form.")
+            messages.error(request, "Please correct the errors in the questions.")
 
     else:
-        # Initialize empty formsets for GET requests
-        question_formset = QuestionFormSet(queryset=survey.questions.all())
+        question_formset = QuestionFormSet(queryset=survey.questions.filter(deleted_at__isnull=True))
 
     return render(request, 'survey/add_questions.html', {
         'survey': survey,
@@ -224,7 +222,7 @@ def edit_question(request, survey_id, question_id=None):
     survey = get_object_or_404(Survey, id=survey_id, creator=request.user)
     question = None
 
-    # Fetch the question if editing
+    # If `question_id` is provided, fetch the existing question; otherwise, prepare for a new question
     if question_id:
         question = get_object_or_404(Question, id=question_id, survey=survey)
 
@@ -246,18 +244,12 @@ def edit_question(request, survey_id, question_id=None):
         if question_form.is_valid() and option_formset.is_valid():
             # Save the question
             question = question_form.save(commit=False)
-            question.survey = survey  # Associate question with the survey
+            question.survey = survey
             question.save()
-            print(f"Saved Question: {question.question_text}")
 
             # Save the options
-            option_formset.instance = question  # Associate options with the question
-            options = option_formset.save(commit=False)
-            for option in options:
-                option.survey = survey  # Associate options with the survey
-                option.save()
-            option_formset.save_m2m()
-            print(f"Options saved for question: {question.question_text}")
+            option_formset.instance = question
+            option_formset.save()
 
             messages.success(request, "Question and options saved successfully!")
             return redirect('edit_survey', survey_id=survey.id)
@@ -290,11 +282,18 @@ def delete_question(request, survey_id, question_id):
 @login_required
 def publish_survey(request, survey_id):
     survey = get_object_or_404(Survey, id=survey_id, creator=request.user)
+
+    # Ensure the survey has at least 5 questions before publishing
+    if survey.questions.filter(deleted_at__isnull=True).count() < 5:
+        messages.error(request, "Cannot publish a survey with less than 5 questions.")
+        return redirect('edit_survey', survey_id=survey.id)
+
     survey.is_published = True
     survey.is_closed = False
     survey.save()
     messages.success(request, "Survey published successfully!")
     return redirect('creator_dashboard')
+
 
 
 # Close a survey

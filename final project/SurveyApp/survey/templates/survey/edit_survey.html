@@ -9,7 +9,7 @@
 
     <!-- Add a New Question -->
     <h3 class="text-center">Add a New Question</h3>
-    <form method="post" class="form-style">
+    <form method="post" action="{% url 'create_question' survey.id %}" class="form-style">
         {% csrf_token %}
         {{ question_form.as_p }}
         {{ option_formset.management_form }}
@@ -27,20 +27,24 @@
     <!-- List of Existing Questions -->
     <h3 class="text-center mt-4">Existing Questions</h3>
     <div class="question-list">
-        {% for question in questions %}
-            <div class="question-item mb-3 p-3">
-                <strong>{{ question.question_text }}</strong> ({{ question.get_question_type_display }})
-                <ul class="option-list">
-                    {% for option in question.options.all %}
-                        <li>{{ option.option_text }}</li>
-                    {% endfor %}
-                </ul>
-                <div class="button-group mt-2">
-                    <a href="{% url 'edit_question' survey.id question.id %}" class="btn modern-btn btn-sm" style="background-color: #ffc107; color: white;">Edit</a>
-                    <a href="{% url 'delete_question' survey.id question.id %}" class="btn modern-btn btn-sm" style="background-color: #ff4d4d; color: white;">Delete</a>
+        {% if questions %}
+            {% for question in questions %}
+                <div class="question-item mb-3 p-3">
+                    <strong>{{ question.question_text }}</strong> ({{ question.get_question_type_display }})
+                    <ul class="option-list">
+                        {% for option in question.options.all %}
+                            <li>{{ option.option_text }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="button-group mt-2">
+                        <a href="{% url 'edit_question' survey.id question.id %}" class="btn modern-btn btn-sm" style="background-color: #ffc107; color: white;">Edit</a>
+                        <a href="{% url 'delete_question' survey.id question.id %}" class="btn modern-btn btn-sm" style="background-color: #ff4d4d; color: white;">Delete</a>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p class="text-center">No questions have been added yet. Start by adding a new question!</p>
+        {% endif %}
     </div>
 
     <!-- Publish or Close Survey -->
@@ -63,7 +67,7 @@
 
 <style>
     .form-container {
-        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+        background-color: rgba(0, 0, 0, 0.7);
         padding: 30px;
         border-radius: 10px;
         margin: auto;
@@ -73,7 +77,7 @@
     }
 
     h2, h3, h4 {
-        color: #00c8ff; /* Bright cyan for headers */
+        color: #00c8ff;
     }
 
     .form-style {
