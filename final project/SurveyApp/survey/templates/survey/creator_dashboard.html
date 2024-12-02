@@ -1,44 +1,114 @@
 {% extends 'survey/base.html' %}
-
-{% block title %}Creator Dashboard{% endblock %}
+{% load static %}
 
 {% block content %}
-    <h2>Welcome, (Survey Creator)</h2>
+    <style>
+        /* Stretch background image to cover the whole page */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
 
-    <h3>Your Surveys</h3>
-    <a href="{% url 'create_survey' %}" class="btn btn-primary">Create New Survey</a>
+        .container {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url("{% static 'images/t6.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
 
-    <ul>
-        {% for survey in surveys %}
-            <li>
-                <strong>{{ survey.title }}</strong>
-                <p>Status: 
-                    {% if survey.is_closed %}
-                        Closed
-                    {% elif survey.is_published %}
-                        Published
-                    {% else %}
-                        Draft
-                    {% endif %}
-                </p>
-                <div>
-                    <a href="{% url 'edit_survey' survey.id %}" class="btn btn-warning btn-sm">Edit</a>
-                    
-                    {% if survey.is_closed %}
-                        <a href="{% url 'republish_survey' survey.id %}" class="btn btn-secondary btn-sm">Republish</a>
-                    {% elif survey.is_published %}
-                        <a href="{% url 'close_survey' survey.id %}" class="btn btn-secondary btn-sm">Close</a>
-                    {% else %}
-                        <a href="{% url 'publish_survey' survey.id %}" class="btn btn-success btn-sm">Publish</a>
-                    {% endif %}
-                    
-                    <a href="{% url 'view_results' survey.id %}" class="btn btn-info btn-sm">View Results</a>
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
+        .content-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+            background-color: rgba(132, 134, 135, 0.7);
+            border-radius: 10px;
+            color: white;
+        }
 
-    {% if not surveys %}
-        <p>No surveys created yet.</p>
-    {% endif %}
+        h2, h3 {
+            text-align: center;
+            color: white;
+        }
+
+        .btn {
+            margin: 5px;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        ul {
+            color: white;
+        }
+
+        li {
+            margin-bottom: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #e8eef0;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e8eef0;
+        }
+    </style>
+
+    <div class="container">
+        <div class="content-wrapper">
+            <h2>Welcome, {{ user.username }}</h2>
+
+            <h3>Your Surveys</h3>
+            <a href="{% url 'create_survey' %}" class="btn btn-primary">Create New Survey</a>
+
+            <ul>
+                {% for survey in surveys %}
+                    <li>
+                        <strong>{{ survey.title }}</strong>
+                        <p>Status: 
+                            {% if survey.is_closed %}
+                                Closed
+                            {% elif survey.is_published %}
+                                Published
+                            {% else %}
+                                Draft
+                            {% endif %}
+                        </p>
+                        <div>
+                            <a href="{% url 'edit_survey' survey.id %}" class="btn btn-warning btn-sm">Edit</a>
+                            
+                            {% if survey.is_closed %}
+                                <a href="{% url 'republish_survey' survey.id %}" class="btn btn-secondary btn-sm">Republish</a>
+                            {% elif survey.is_published %}
+                                <a href="{% url 'close_survey' survey.id %}" class="btn btn-secondary btn-sm">Close</a>
+                            {% else %}
+                                <a href="{% url 'publish_survey' survey.id %}" class="btn btn-success btn-sm">Publish</a>
+                            {% endif %}
+                            
+                            <a href="{% url 'view_results' survey.id %}" class="btn btn-info btn-sm">View Results</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% if not surveys %}
+                <p>No surveys created yet.</p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

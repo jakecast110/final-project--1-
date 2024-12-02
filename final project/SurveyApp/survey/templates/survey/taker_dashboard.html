@@ -1,27 +1,90 @@
 {% extends 'survey/base.html' %}
-
-{% block title %}Survey Taker Dashboard{% endblock %}
+{% load static %}
 
 {% block content %}
-    <h1>Welcome, {{ user_name }} ({{ role }})</h1>
-    {% if messages %}
-        {% for message in messages %}
-        <p>{{message}}</p>
-        {% endfor %}
-    {% endif %}
-    <h2>Available Surveys</h2>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
 
-    <div class="survey-list">
-        {% if surveys %}
-            {% for survey in surveys %}
-                <div class="survey-item">
-                    <h3>{{ survey.title }}</h3>
-                    <p>{{ survey.description }}</p>
-                    <a href="{% url 'take_survey' survey.id %}" class="take-survey">Take Survey</a>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No surveys are available at the moment.</p>
-        {% endif %}
+        .container {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url("{% static 'images/t6.jpg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            color: white;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: white;
+        }
+
+        .survey-list {
+            margin-top: 20px;
+        }
+
+        .survey-item {
+            background-color: rgba(132, 134, 135, 0.7);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .take-survey {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #82c5dd;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .take-survey:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+    <div class="container">
+        <div class="content-wrapper">
+            <h1>Welcome, {{ user_name }} ({{ role }})</h1>
+            {% if messages %}
+                {% for message in messages %}
+                <p>{{message}}</p>
+                {% endfor %}
+            {% endif %}
+            <h2>Available Surveys</h2>
+
+            <div class="survey-list">
+                {% if surveys %}
+                    {% for survey in surveys %}
+                        <div class="survey-item">
+                            <h3>{{ survey.title }}</h3>
+                            <p>{{ survey.description }}</p>
+                            <a href="{% url 'take_survey' survey.id %}" class="take-survey">Take Survey</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No surveys are available at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 {% endblock %}
