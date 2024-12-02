@@ -30,9 +30,3 @@ python manage.py migrate --run-syncdb
 ```
 ### Authors
 Jake Castellano, Shunottara Ingle, Nayanpreet Chhabra, Prasanna Bidkar
-
-``bash
-python manage.py runserver
-```
-
-Copy the url output in the terminal (should look like "http://127.0.0.1:8000/") and paste it into whataver browser you would like to use and have fun!
