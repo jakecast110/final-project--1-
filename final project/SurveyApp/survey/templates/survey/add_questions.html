@@ -1,101 +1,201 @@
 {% extends 'survey/base.html' %}
+{% load static %}
 
 {% block title %}Add Questions{% endblock %}
 
 {% block content %}
-    <h2>Add Questions to Survey: {{ survey.title }}</h2>
-    <p><strong>Survey Description:</strong> {{ survey.description }}</p>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+    }
 
-    <form method="post">
-        {% csrf_token %}
-        {{ question_formset.management_form }}
-        <div id="question-container">
-            {% for form in question_formset %}
-                <div class="question-item mb-4 border p-3">
-                    {{ form.id }}
-                    <label><strong>Question {{ forloop.counter }}:</strong></label>
-                    {{ form.question_text.errors }}
-                    {{ form.question_text }}
-                    <label><strong>Question Type:</strong></label>
-                    {{ form.question_type.errors }}
-                    {{ form.question_type }}
+    .container {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-image: url("{% static 'images/t6.jpg' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
 
-                    <!-- Dynamic Options Section -->
-                    <div class="options-container mt-3">
-                        <h5>Options:</h5>
-                        <div id="options-container-{{ forloop.counter }}" class="mb-2">
-                            <input type="text" name="option_text_{{ forloop.counter }}[]" class="form-control mb-2" placeholder="Enter option text">
-                        </div>
-                        <button type="button" class="btn btn-secondary btn-sm add-option-btn" data-counter="{{ forloop.counter }}">Add Option</button>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        <button type="button" id="add-question-btn" class="btn btn-secondary">Add Question</button>
-        <button type="submit" class="btn btn-primary">Save Questions</button>
-    </form>
+    .content-wrapper {
+        width: 100%;
+        max-width: 1000px;
+        padding: 20px;
+        background-color: rgba(132, 134, 135, 0.7);
+        border-radius: 10px;
+        color: white;
+    }
 
-    <a href="{% url 'creator_dashboard' %}" class="btn btn-link mt-3">Back to Dashboard</a>
+    h2, h3, h5 {
+        text-align: center;
+        color: white;
+    }
 
-    <!-- JavaScript for Dynamic Addition -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let questionCounter = parseInt("{{ question_formset.total_form_count|default:'0' }}");
+    .btn {
+        margin: 5px;
+    }
 
-            // Add new question dynamically
-            const addQuestionButton = document.getElementById("add-question-btn");
-            const questionContainer = document.getElementById("question-container");
-            const managementForm = document.querySelector("#id_form-TOTAL_FORMS");
+    .register-link {
+        text-align: center;
+        margin-top: 15px;
+    }
 
-            addQuestionButton.addEventListener("click", function () {
-                questionCounter++;
-                const newQuestion = `
+    ul {
+        color: white;
+    }
+
+    li {
+        margin-bottom: 15px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #e8eef0;
+        color: black;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #d1d8da;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"], textarea, select {
+        width: 100%;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        background-color: white;
+        color: black;
+    }
+
+    .question-item {
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+
+    .options-container {
+        margin-top: 10px;
+    }
+</style>
+
+<div class="container">
+    <div class="content-wrapper">
+        <h2>Add Questions to Survey: {{ survey.title }}</h2>
+        <p><strong>Survey Description:</strong> {{ survey.description }}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ question_formset.management_form }}
+            <div id="question-container">
+                {% for form in question_formset %}
                     <div class="question-item mb-4 border p-3">
-                        <label><strong>Question ${questionCounter}:</strong></label>
-                        <input type="text" name="form-${questionCounter}-question_text" class="form-control mb-2" placeholder="Enter question text">
+                        {{ form.id }}
+                        <label><strong>Question {{ forloop.counter }}:</strong></label>
+                        {{ form.question_text.errors }}
+                        {{ form.question_text }}
                         <label><strong>Question Type:</strong></label>
-                        <select name="form-${questionCounter}-question_type" class="form-control mb-2">
-                            <option value="" selected>---------</option>
-                            <option value="MC">Multiple Choice</option>
-                            <option value="CB">Checkbox</option>
-                        </select>
+                        {{ form.question_type.errors }}
+                        {{ form.question_type }}
+
+                        <!-- Dynamic Options Section -->
                         <div class="options-container mt-3">
                             <h5>Options:</h5>
-                            <div id="options-container-${questionCounter}" class="mb-2">
-                                <input type="text" name="option_text_${questionCounter}[]" class="form-control mb-2" placeholder="Enter option text">
+                            <div id="options-container-{{ forloop.counter }}" class="mb-2">
+                                <input type="text" name="option_text_{{ forloop.counter }}[]" class="form-control mb-2" placeholder="Enter option text">
                             </div>
-                            <button type="button" class="btn btn-secondary btn-sm add-option-btn" data-counter="${questionCounter}">Add Option</button>
+                            <button type="button" class="btn btn-secondary btn-sm add-option-btn" data-counter="{{ forloop.counter }}">Add Option</button>
                         </div>
                     </div>
-                `;
-                questionContainer.insertAdjacentHTML("beforeend", newQuestion);
-                managementForm.value = questionCounter; // Update TOTAL_FORMS count
+                {% endfor %}
+            </div>
+            <button type="button" id="add-question-btn" class="btn btn-secondary">Add Question</button>
+            <button type="submit" class="btn btn-primary">Save Questions</button>
+        </form>
 
-                // Reattach the event listener for adding options
-                attachAddOptionListeners();
-            });
+        <a href="{% url 'creator_dashboard' %}" class="btn btn-link mt-3">Back to Dashboard</a>
+    </div>
+</div>
 
-            // Add options dynamically
-            function attachAddOptionListeners() {
-                const addOptionButtons = document.querySelectorAll(".add-option-btn");
-                addOptionButtons.forEach(button => {
-                    button.addEventListener("click", function () {
-                        const questionNumber = this.dataset.counter;
-                        const optionsContainer = document.getElementById(`options-container-${questionNumber}`);
+<!-- JavaScript for Dynamic Addition -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let questionCounter = parseInt("{{ question_formset.total_form_count|default:'0' }}");
 
-                        const newOption = document.createElement("input");
-                        newOption.type = "text";
-                        newOption.name = `option_text_${questionNumber}[]`;
-                        newOption.placeholder = "Enter option text";
-                        newOption.className = "form-control mb-2";
+        // Add new question dynamically
+        const addQuestionButton = document.getElementById("add-question-btn");
+        const questionContainer = document.getElementById("question-container");
+        const managementForm = document.querySelector("#id_form-TOTAL_FORMS");
 
-                        optionsContainer.appendChild(newOption);
-                    });
-                });
-            }
+        addQuestionButton.addEventListener("click", function () {
+            questionCounter++;
+            const newQuestion = `
+                <div class="question-item mb-4 border p-3">
+                    <label><strong>Question ${questionCounter}:</strong></label>
+                    <input type="text" name="form-${questionCounter}-question_text" class="form-control mb-2" placeholder="Enter question text">
+                    <label><strong>Question Type:</strong></label>
+                    <select name="form-${questionCounter}-question_type" class="form-control mb-2">
+                        <option value="" selected>---------</option>
+                        <option value="MC">Multiple Choice</option>
+                        <option value="CB">Checkbox</option>
+                    </select>
+                    <div class="options-container mt-3">
+                        <h5>Options:</h5>
+                        <div id="options-container-${questionCounter}" class="mb-2">
+                            <input type="text" name="option_text_${questionCounter}[]" class="form-control mb-2" placeholder="Enter option text">
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm add-option-btn" data-counter="${questionCounter}">Add Option</button>
+                    </div>
+                </div>
+            `;
+            questionContainer.insertAdjacentHTML("beforeend", newQuestion);
+            managementForm.value = questionCounter; // Update TOTAL_FORMS count
 
-            // Initial attach for existing options
+            // Reattach the event listener for adding options
             attachAddOptionListeners();
         });
-    </script>
+
+        // Add options dynamically
+        function attachAddOptionListeners() {
+            const addOptionButtons = document.querySelectorAll(".add-option-btn");
+            addOptionButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    const questionNumber = this.dataset.counter;
+                    const optionsContainer = document.getElementById(`options-container-${questionNumber}`);
+
+                    const newOption = document.createElement("input");
+                    newOption.type = "text";
+                    newOption.name = `option_text_${questionNumber}[]`;
+                    newOption.placeholder = "Enter option text";
+                    newOption.className = "form-control mb-2";
+
+                    optionsContainer.appendChild(newOption);
+                });
+            });
+        }
+
+        // Initial attach for existing options
+        attachAddOptionListeners();
+    });
+</script>
 {% endblock %}

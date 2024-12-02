@@ -1,27 +1,96 @@
 {% extends 'survey/base.html' %}
+{% load static %}
 
 {% block content %}
-    <h2>{{survey.title}}</h2>
-    <p>{{survey.description}}</p>
-    <form method="POST" action="{% url 'submit_response' survey.id%}">
-        {% csrf_token %}
-        {% for question in questions %}
-            <p>{{question.question_text}}</p>
-            {% for option in options %}
-                {% if option.question_id == question.id%}
-                    {% if question.question_type == 'MC' %}
-                        <p><input name='question_{{question.id}}' type="radio" value={{option.id}}>{{option.option_text}}</p>
-                    {% else %}
-                        <p><input name='question_{{question.id}}' type="checkbox" value={{option.id}}>{{option.option_text}}</p>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+    }
+
+    .container {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-image: url("{% static 'images/t6.jpg' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .content-wrapper {
+        width: 100%;
+        max-width: 1000px;
+        padding: 20px;
+        background-color: rgba(132, 134, 135, 0.7);
+        border-radius: 10px;
+        color: white;
+    }
+
+    h2 {
+        text-align: center;
+        color: white;
+    }
+
+    p {
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    form {
+        margin-bottom: 20px;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin-right: 10px;
+    }
+
+    input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        background-color: #e8eef0;
+        color: black;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #d1d8da;
+    }
+</style>
+
+<div class="container">
+    <div class="content-wrapper">
+        <h2>{{survey.title}}</h2>
+        <p>{{survey.description}}</p>
+        <form method="POST" action="{% url 'submit_response' survey.id%}">
+            {% csrf_token %}
+            {% for question in questions %}
+                <p>{{question.question_text}}</p>
+                {% for option in options %}
+                    {% if option.question_id == question.id%}
+                        {% if question.question_type == 'MC' %}
+                            <p><input name='question_{{question.id}}' type="radio" value={{option.id}}>{{option.option_text}}</p>
+                        {% else %}
+                            <p><input name='question_{{question.id}}' type="checkbox" value={{option.id}}>{{option.option_text}}</p>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
+                {% endfor %}
             {% endfor %}
-        {% endfor %}
-        <input type="submit" name="response_submit" value="Submit Response">
-    </form>
-    {% if messages %}
-        {% for message in messages %}
-            <p>{{message}}</p>
-        {% endfor %}
-    {% endif %}
-    {% endblock %}
+            <input type="submit" name="response_submit" value="Submit Response">
+        </form>
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{message}}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

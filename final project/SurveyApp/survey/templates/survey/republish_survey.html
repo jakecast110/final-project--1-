@@ -1,40 +1,102 @@
 {% extends 'survey/base.html' %}
+{% load static %}
 
 {% block title %}Republish Survey{% endblock %}
 
 {% block content %}
-    <h2>Republish Survey: {{ survey.title }}</h2>
-    <p>{{ survey.description }}</p>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+    }
 
-    <!-- Aggregated Statistics -->
-    <h3>Wisdom of the Crowd: Aggregated Insights</h3>
-    {% if statistics %}
-        <ul>
-            {% for question_text, options in statistics.items %}
-                <li>
-                    <strong>{{ question_text }}</strong>
-                    {% if options %}
-                        <ul>
-                            {% for option_text, vote_count in options %}
-                                <li>{{ option_text }}: {{ vote_count }} votes</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No responses recorded for this question.</p>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No previous responses available for this survey.</p>
-    {% endif %}
+    .container {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-image: url("{% static 'images/t6.jpg' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
 
-    <!-- Button to Confirm Republish -->
-    <form method="post" action="{% url 'republish_survey' survey.id %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Republish Survey</button>
-    </form>
+    .content-wrapper {
+        width: 100%;
+        max-width: 1000px;
+        padding: 20px;
+        background-color: rgba(132, 134, 135, 0.7);
+        border-radius: 10px;
+        color: white;
+    }
 
-    <!-- Back to Dashboard -->
-    <a href="{% url 'creator_dashboard' %}" class="btn btn-link">Back to Dashboard</a>
+    h2, h3 {
+        text-align: center;
+        color: white;
+    }
+
+    p, ul, li {
+        color: white;
+    }
+
+    .btn {
+        margin: 5px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #e8eef0;
+        color: black;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #d1d8da;
+    }
+</style>
+
+<div class="container">
+    <div class="content-wrapper">
+        <h2>Republish Survey: {{ survey.title }}</h2>
+        <p>{{ survey.description }}</p>
+
+        <!-- Aggregated Statistics -->
+        <h3>Wisdom of the Crowd: Aggregated Insights</h3>
+        {% if statistics %}
+            <ul>
+                {% for question_text, options in statistics.items %}
+                    <li>
+                        <strong>{{ question_text }}</strong>
+                        {% if options %}
+                            <ul>
+                                {% for option_text, vote_count in options %}
+                                    <li>{{ option_text }}: {{ vote_count }} votes</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No responses recorded for this question.</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No previous responses available for this survey.</p>
+        {% endif %}
+
+        <!-- Button to Confirm Republish -->
+        <form method="post" action="{% url 'republish_survey' survey.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Republish Survey</button>
+        </form>
+
+        <!-- Back to Dashboard -->
+        <a href="{% url 'creator_dashboard' %}" class="btn btn-link">Back to Dashboard</a>
+    </div>
+</div>
 {% endblock %}
